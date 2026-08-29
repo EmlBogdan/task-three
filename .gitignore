@@ -1,0 +1,12 @@
+**/.terraform/*
+*.tfstate
+*.tfstate.*
+*.tfstate.backup
+crash.log
+crash.*.log
+.terraformrc
+terraform.rc
+*.tfplan
+*.tfvars
+*.tfvars.json
+jump_conf.sh
