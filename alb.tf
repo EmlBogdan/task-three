@@ -72,10 +72,10 @@ resource "aws_lb_listener" "ollama_listener" {
   }
 }
 
-resource "aws_autoscaling_attachment" "asg_attachment" {
-  autoscaling_group_name = aws_autoscaling_group.app_asg.name
-  lb_target_group_arn    = aws_lb_target_group.llm_tg.arn
-}
+# resource "aws_autoscaling_attachment" "asg_attachment" {
+#   autoscaling_group_name = aws_autoscaling_group.app_asg.name
+#   lb_target_group_arn    = aws_lb_target_group.llm_tg.arn
+# }
 
 resource "aws_lb_target_group" "webui_tg" {
   name     = "webui-tg-t-one"
@@ -92,11 +92,11 @@ resource "aws_lb_target_group" "webui_tg" {
   }
 }
 
-resource "aws_lb_target_group_attachment" "webui_attachment" {
-  target_group_arn = aws_lb_target_group.webui_tg.arn
-  target_id        = aws_instance.webui_host.id
-  port             = 8080
-}
+# resource "aws_lb_target_group_attachment" "webui_attachment" {
+#   target_group_arn = aws_lb_target_group.webui_tg.arn
+#   target_id        = aws_instance.webui_host.id
+#   port             = 8080
+# }
 
 resource "aws_lb_target_group" "grafana_tg" {
   name     = "grafana-tg-t-one"
@@ -113,11 +113,11 @@ resource "aws_lb_target_group" "grafana_tg" {
   }
 }
 
-resource "aws_lb_target_group_attachment" "grafana_attachment" {
-  target_group_arn = aws_lb_target_group.grafana_tg.arn
-  target_id        = aws_instance.monitor_host.id
-  port             = 3000
-}
+# resource "aws_lb_target_group_attachment" "grafana_attachment" {
+#   target_group_arn = aws_lb_target_group.grafana_tg.arn
+#   target_id        = aws_instance.monitor_host.id
+#   port             = 3000
+# }
 
 resource "aws_lb_target_group" "prometheus_tg" {
   name     = "prometheus-tg-t-one"
@@ -134,8 +134,8 @@ resource "aws_lb_target_group" "prometheus_tg" {
   }
 }
 
-resource "aws_lb_target_group_attachment" "prometheus_attachment" {
-  target_group_arn = aws_lb_target_group.prometheus_tg.arn
-  target_id        = aws_instance.monitor_host.id
-  port             = 9090
-}
+# resource "aws_lb_target_group_attachment" "prometheus_attachment" {
+#   target_group_arn = aws_lb_target_group.prometheus_tg.arn
+#   target_id        = aws_instance.monitor_host.id
+#   port             = 9090
+# }
