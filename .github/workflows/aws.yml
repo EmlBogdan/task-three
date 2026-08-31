@@ -50,7 +50,7 @@ jobs:
       id: login-ecr
       uses: aws-actions/amazon-ecr-login@v1
 
-    - name: Build, tag, and push image to Amazon ECR
+    - name: Pull ollama image 
       id: build-image
       env:
         ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
@@ -58,8 +58,20 @@ jobs:
         IMAGE_TAG: latest
       run: |
         docker pull ollama/ollama
+    
+    - name: Tag ollama image 
+      id: tag-image
+      env:
+        ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+        ECR_REPOSITORY: 324062893129.dkr.ecr.us-east-1.amazonaws.com/ollama-repository
+        IMAGE_TAG: latest
+      run: |
         docker tag ollama/ollama:latest $ECR_REPOSITORY
-        docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
 
+    - name: Push ollama image 
+      id: push-image
+      run: |
+        docker push ollama/ollama:latest
+      
 
 
