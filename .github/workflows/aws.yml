@@ -48,7 +48,11 @@ jobs:
 
     - name: Login to Amazon ECR
       id: login-ecr
-      uses: aws-actions/amazon-ecr-login@v1
+      env:
+        ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+        ECR_REPOSITORY: 324062893129.dkr.ecr.us-east-1.amazonaws.com/ollama-repository
+      run: | 
+        aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin $ECR_REPOSITORY
 
     - name: Pull ollama image 
       id: build-image
@@ -65,9 +69,27 @@ jobs:
         ECR_REPOSITORY: 324062893129.dkr.ecr.us-east-1.amazonaws.com/ollama-repository
         IMAGE_TAG: ollama
       run: |
-        aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin $ECR_REPOSITORY
         docker tag ollama/ollama:latest ollama/ollama:$IMAGE_TAG
         docker tag ollama/ollama:${IMAGE_TAG} $ECR_REPOSITORY:${IMAGE_TAG}
+    
+    - name: Pull webui image 
+      id: build-webui-image
+      env:
+        ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+        ECR_REPOSITORY: 324062893129.dkr.ecr.us-east-1.amazonaws.com/ollama-repository
+      run: |
+        docker pull ghcr.io/open-webui/open-webui:main
+    
+    - name: Tag webui image 
+      id: tag-webui-image
+      env:
+        ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+        ECR_REPOSITORY: 324062893129.dkr.ecr.us-east-1.amazonaws.com/ollama-repository
+        IMAGE_TAG: webui
+      run: |
+        docker tag ghcr.io/open-webui/open-webui:main ghcr.io/open-webui/open-webui:$IMAGE_TAG
+        docker tag ghcr.io/open-webui/open-webui:${IMAGE_TAG} $ECR_REPOSITORY:${IMAGE_TAG}
+
     - name: Push ollama image 
       env:
         ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
@@ -75,6 +97,7 @@ jobs:
       id: push-image
       run: |
         docker push ${ECR_REPOSITORY}:ollama
+        docker push ${ECR_REPOSITORY}:webui
       
 
 
