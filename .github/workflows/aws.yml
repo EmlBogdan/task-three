@@ -70,9 +70,12 @@ jobs:
         docker tag ollama/ollama:$IMAGE_TAG $ECR_REPOSITORY
 
     - name: Push ollama image 
+      env:
+        ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+        ECR_REPOSITORY: 324062893129.dkr.ecr.us-east-1.amazonaws.com/ollama-repository
       id: push-image
       run: |
-        docker push ollama/ollama:latest
+        docker push ${ECR_REPOSITORY:latest}
       
 
 
