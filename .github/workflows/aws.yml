@@ -54,9 +54,11 @@ jobs:
       id: build-image
       env:
         ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+        ECR_REPOSITORY: 324062893129.dkr.ecr.us-east-1.amazonaws.com/ollama-repository
+        IMAGE_TAG: latest
       run: |
         docker pull ollama/ollama
-        docker push $ECR_REGISTRY/324062893129.dkr.ecr.us-east-1.amazonaws.com/ollama-repository
+        docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
 
 
 
