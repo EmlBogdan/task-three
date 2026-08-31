@@ -75,7 +75,7 @@ jobs:
         ECR_REPOSITORY: 324062893129.dkr.ecr.us-east-1.amazonaws.com/ollama-repository
       id: push-image
       run: |
-        docker push ${ECR_REPOSITORY:latest}
+        docker push ${ECR_REPOSITORY}:ollama
       
 
 
