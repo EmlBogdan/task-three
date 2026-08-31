@@ -67,7 +67,7 @@ jobs:
         IMAGE_TAG: latest
       run: |
         aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin $ECR_REPOSITORY
-        docker tag ollama/ollama:ollama $ECR_REPOSITORY
+        docker tag ollama/ollama:${IMAGE_TAG} $ECR_REPOSITORY
 
     - name: Push ollama image 
       env:
@@ -75,7 +75,7 @@ jobs:
         ECR_REPOSITORY: 324062893129.dkr.ecr.us-east-1.amazonaws.com/ollama-repository
       id: push-image
       run: |
-        docker push ${ECR_REPOSITORY}:ollama
+        docker push ${ECR_REPOSITORY}:latest
       
 
 
