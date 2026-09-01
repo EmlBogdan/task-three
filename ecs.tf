@@ -31,13 +31,3 @@ resource "aws_iam_role_policy_attachment" "ecs_task_execution_role" {
   policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy"
 }
 
-data "template_file" "webui-template" {
-  template = file("./webui-task.json.tpl")
-  vars = {
-    aws_ecr_repository = aws_ecr_repository.ollama_repository.repository_url
-    tag                = "webui"
-    app_port           = 8080
-  }
-}
-
-
