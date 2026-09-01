@@ -30,16 +30,14 @@ on:
   push:
     branches: [ "main" ]
 
-permissions:
-  id-token: write
-  contents: read
-
 
 jobs:
   deploy:
     name: Deploy
     runs-on: ubuntu-latest
-
+    permissions:
+      id-token: write
+      contents: read
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
