@@ -16,6 +16,7 @@ resource "aws_ecs_task_definition" "webui_task_definition" {
     cpu       = 1024
     memory    = 2048
     essential = true
+
     portMapping = [
       {
         containerPort = 8080
