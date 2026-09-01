@@ -49,7 +49,6 @@ jobs:
     - name: Login to Amazon ECR
       id: login-ecr
       env:
-        ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
         ECR_REPOSITORY: 324062893129.dkr.ecr.us-east-1.amazonaws.com/ollama-repository
       run: | 
         aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin $ECR_REPOSITORY
@@ -57,15 +56,14 @@ jobs:
     - name: Pull ollama image 
       id: build-image
       env:
-        ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
         ECR_REPOSITORY: 324062893129.dkr.ecr.us-east-1.amazonaws.com/ollama-repository
       run: |
         docker pull ollama/ollama
+        docker exec -it ollama ollama pull tinyllama
     
     - name: Tag ollama image 
       id: tag-image
       env:
-        ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
         ECR_REPOSITORY: 324062893129.dkr.ecr.us-east-1.amazonaws.com/ollama-repository
         IMAGE_TAG: ollama
       run: |
@@ -75,7 +73,6 @@ jobs:
     - name: Pull webui image 
       id: build-webui-image
       env:
-        ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
         ECR_REPOSITORY: 324062893129.dkr.ecr.us-east-1.amazonaws.com/ollama-repository
       run: |
         docker pull ghcr.io/open-webui/open-webui:main
@@ -83,18 +80,16 @@ jobs:
     - name: Tag webui image 
       id: tag-webui-image
       env:
-        ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
         ECR_REPOSITORY: 324062893129.dkr.ecr.us-east-1.amazonaws.com/ollama-repository
         IMAGE_TAG: webui
       run: |
         docker tag ghcr.io/open-webui/open-webui:main ghcr.io/open-webui/open-webui:$IMAGE_TAG
         docker tag ghcr.io/open-webui/open-webui:${IMAGE_TAG} $ECR_REPOSITORY:${IMAGE_TAG}
 
-    - name: Push ollama image 
+    - name: Push images
       env:
-        ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
         ECR_REPOSITORY: 324062893129.dkr.ecr.us-east-1.amazonaws.com/ollama-repository
-      id: push-image
+      id: push-images
       run: |
         docker push ${ECR_REPOSITORY}:ollama
         docker push ${ECR_REPOSITORY}:webui
