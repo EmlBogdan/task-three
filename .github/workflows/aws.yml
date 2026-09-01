@@ -46,6 +46,7 @@ jobs:
     - name: Configure AWS credentials
       uses: aws-actions/configure-aws-credentials@v6.2.4
       with:
+        audience: sts.amazonaws.com.cn
         role-to-assume: ${{secrets.AWS_IAM_ROLE}}
         aws-region: us-east-1
 
