@@ -46,6 +46,7 @@ jobs:
       with:
         role-to-assume: arn:aws:iam::324062893129:role/AWS-gha-role
         aws-region: us-east-1
+        role-session-name: GHActionsSession
 
     - name: test aws credentials
       run: aws sts get-caller-identity
