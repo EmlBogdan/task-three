@@ -41,14 +41,6 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v4
 
-    - name: Debug OIDC Token Claims
-      uses: actions/github-script@v7
-      with:
-        script: |
-          const token = await core.getIDToken('sts.amazonaws.com');
-          const payload = Buffer.from(token.split('.')[1], 'base64').toString();
-          console.log(JSON.stringify(JSON.parse(payload), null, 2));
-
     - name: Configure AWS credentials
       uses: aws-actions/configure-aws-credentials@v6.2.3
       with:
@@ -98,6 +90,39 @@ jobs:
         docker tag ghcr.io/open-webui/open-webui:main ghcr.io/open-webui/open-webui:$IMAGE_TAG
         docker tag ghcr.io/open-webui/open-webui:${IMAGE_TAG} $ECR_REPOSITORY:${IMAGE_TAG}
 
+    - name: Pull grafana image 
+      id: build-grafana-image
+      env:
+        ECR_REPOSITORY: 324062893129.dkr.ecr.us-east-1.amazonaws.com/ollama-repository
+      run: |
+        docker pull grafana/grafana-enterprise
+    
+    - name: Tag grafana image 
+      id: tag-grafana-image
+      env:
+        ECR_REPOSITORY: 324062893129.dkr.ecr.us-east-1.amazonaws.com/ollama-repository
+        IMAGE_TAG: grafana
+      run: |
+        docker tag grafana/grafana-enterprise:latest grafana/grafana-enterprise:$IMAGE_TAG
+        docker tag grafana/grafana-enterprise:${IMAGE_TAG} $ECR_REPOSITORY:${IMAGE_TAG}
+
+    - name: Pull prometheus image 
+      id: build-prometheus-image
+      env:
+        ECR_REPOSITORY: 324062893129.dkr.ecr.us-east-1.amazonaws.com/ollama-repository
+      run: |
+        docker pull prom/prometheus
+    
+    - name: Tag prometheus image 
+      id: tag-prometheus-image
+      env:
+        ECR_REPOSITORY: 324062893129.dkr.ecr.us-east-1.amazonaws.com/ollama-repository
+        IMAGE_TAG: prometheus
+      run: |
+        docker tag prom/prometheus:latest prom/prometheus:$IMAGE_TAG
+        docker tag prom/prometheus:${IMAGE_TAG} $ECR_REPOSITORY:${IMAGE_TAG}
+
+
     - name: Push images
       env:
         ECR_REPOSITORY: 324062893129.dkr.ecr.us-east-1.amazonaws.com/ollama-repository
@@ -105,6 +130,8 @@ jobs:
       run: |
         docker push ${ECR_REPOSITORY}:ollama
         docker push ${ECR_REPOSITORY}:webui
+        docker push ${ECR_REPOSITORY}:grafana
+        docker push ${ECR_REPOSITORY}:prometheus
       
 
 
