@@ -3,7 +3,7 @@ data "aws_ecr_image" "webui_image" {
   image_tag       = "webui"
 }
 
-resource "aws_ecs_task_definition" "webui-service" {
+resource "aws_ecs_task_definition" "webui_task_definition" {
   family                   = "webui"
   network_mode             = "awsvpc"
   execution_role_arn       = aws_iam_role.ecs_task_execution_role.arn
@@ -32,7 +32,7 @@ resource "aws_ecs_task_definition" "webui-service" {
 resource "aws_ecs_service" "webui-service" {
   name            = "webui-service"
   cluster         = aws_ecs_cluster.ollama-cluster.id
-  task_definition = aws_ecs_task_definition.webui-service.arn
+  task_definition = aws_ecs_task_definition.webui_task_definition.arn
   desired_count   = 1
 
   launch_type      = "FARGATE"
