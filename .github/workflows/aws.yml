@@ -48,7 +48,7 @@ jobs:
       uses: aws-actions/configure-aws-credentials@v6.2.4
       with:
         audience: sts.amazonaws.com.cn
-        role-to-assume: ${{secrets.AWS_IAM_ROLE}}
+        role-to-assume: arn:aws:iam::324062893129:role/gha-role
         aws-region: us-east-1
 
     - name: test aws credentials
