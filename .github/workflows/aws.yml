@@ -48,9 +48,6 @@ jobs:
         aws-region: us-east-1
         role-session-name: GHActionsSession
 
-    - name: test aws credentials
-      run: aws sts get-caller-identity
-
     - name: Login to Amazon ECR
       id: login-ecr
       env:
@@ -69,7 +66,7 @@ jobs:
       id: tag-image
       env:
         ECR_REPOSITORY: 324062893129.dkr.ecr.us-east-1.amazonaws.com/ollama-repository
-        IMAGE_TAG: ollama
+        IMAGE_TAG: ollama-base-image
       run: |
         docker tag ollama:latest ollama:$IMAGE_TAG
         docker tag ollama:${IMAGE_TAG} $ECR_REPOSITORY:${IMAGE_TAG}
@@ -85,7 +82,7 @@ jobs:
       id: tag-webui-image
       env:
         ECR_REPOSITORY: 324062893129.dkr.ecr.us-east-1.amazonaws.com/ollama-repository
-        IMAGE_TAG: webui
+        IMAGE_TAG: webui-base-image
       run: |
         docker tag ghcr.io/open-webui/open-webui:main ghcr.io/open-webui/open-webui:$IMAGE_TAG
         docker tag ghcr.io/open-webui/open-webui:${IMAGE_TAG} $ECR_REPOSITORY:${IMAGE_TAG}
@@ -116,7 +113,7 @@ jobs:
       id: tag-grafana-image
       env:
         ECR_REPOSITORY: 324062893129.dkr.ecr.us-east-1.amazonaws.com/ollama-repository
-        IMAGE_TAG: grafana
+        IMAGE_TAG: grafana-base-image
       run: |
         docker tag grafana:latest grafana:$IMAGE_TAG
         docker tag grafana:${IMAGE_TAG} $ECR_REPOSITORY:${IMAGE_TAG}
@@ -132,7 +129,7 @@ jobs:
       id: tag-prometheus-image
       env:
         ECR_REPOSITORY: 324062893129.dkr.ecr.us-east-1.amazonaws.com/ollama-repository
-        IMAGE_TAG: prometheus
+        IMAGE_TAG: prometheus-base-image
       run: |
         docker tag prom/prometheus:latest prom/prometheus:$IMAGE_TAG
         docker tag prom/prometheus:${IMAGE_TAG} $ECR_REPOSITORY:${IMAGE_TAG}
@@ -143,10 +140,10 @@ jobs:
         ECR_REPOSITORY: 324062893129.dkr.ecr.us-east-1.amazonaws.com/ollama-repository
       id: push-images
       run: |
-        docker push ${ECR_REPOSITORY}:ollama
-        docker push ${ECR_REPOSITORY}:webui
-        docker push ${ECR_REPOSITORY}:grafana
-        docker push ${ECR_REPOSITORY}:prometheus
+        docker push ${ECR_REPOSITORY}:ollama-base-image
+        docker push ${ECR_REPOSITORY}:webui-base-image
+        docker push ${ECR_REPOSITORY}:grafana-base-image
+        docker push ${ECR_REPOSITORY}:prometheus-base-image
       
 
 
