@@ -71,7 +71,7 @@ jobs:
         ECR_REPOSITORY: 324062893129.dkr.ecr.us-east-1.amazonaws.com/ollama-repository
         IMAGE_TAG: ollama
       run: |
-        docker tag ollama:latest ollama/ollama:$IMAGE_TAG
+        docker tag ollama:latest ollama:$IMAGE_TAG
         docker tag ollama:${IMAGE_TAG} $ECR_REPOSITORY:${IMAGE_TAG}
     
     - name: Pull webui image 
