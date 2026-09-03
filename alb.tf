@@ -7,7 +7,7 @@ resource "aws_security_group" "ollama_alb_sg" {
   }
 }
 
-resource "aws_vpc_security_group_ingress_rule" "allow_ollama" {
+resource "aws_vpc_security_group_ingress_rule" "allow_lb_ollama" {
   security_group_id = aws_security_group.ollama_alb_sg.id
   cidr_ipv4         = "0.0.0.0/0"
   from_port         = 11434
@@ -15,20 +15,28 @@ resource "aws_vpc_security_group_ingress_rule" "allow_ollama" {
   to_port           = 11434
 }
 
-resource "aws_vpc_security_group_ingress_rule" "allow_lb_https" {
+resource "aws_vpc_security_group_ingress_rule" "allow_lb_webui" {
   security_group_id = aws_security_group.ollama_alb_sg.id
   cidr_ipv4         = "0.0.0.0/0"
-  from_port         = 443
+  from_port         = 8080
   ip_protocol       = "tcp"
-  to_port           = 443
+  to_port           = 8080
 }
 
-resource "aws_vpc_security_group_ingress_rule" "allow_lb_http" {
+resource "aws_vpc_security_group_ingress_rule" "allow_lb_grafana" {
   security_group_id = aws_security_group.ollama_alb_sg.id
   cidr_ipv4         = "0.0.0.0/0"
-  from_port         = 80
+  from_port         = 3000
   ip_protocol       = "tcp"
-  to_port           = 80
+  to_port           = 3000
+}
+
+resource "aws_vpc_security_group_ingress_rule" "allow_lb_prometheus" {
+  security_group_id = aws_security_group.ollama_alb_sg.id
+  cidr_ipv4         = "0.0.0.0/0"
+  from_port         = 9090
+  ip_protocol       = "tcp"
+  to_port           = 9090
 }
 
 resource "aws_vpc_security_group_egress_rule" "allow_all_outcoming_traffic_ipv4" {
@@ -47,11 +55,11 @@ resource "aws_lb" "ollama_alb" {
 }
 
 resource "aws_lb_target_group" "llm_tg" {
-  name     = "webui-tg-t-one-ollama"
-  port     = 11434
-  protocol = "HTTP"
-  vpc_id   = aws_vpc.main_vpc.id
-
+  name        = "webui-tg-t-one-ollama"
+  port        = 11434
+  protocol    = "HTTP"
+  vpc_id      = aws_vpc.main_vpc.id
+  target_type = "ip"
   health_check {
     healthy_threshold   = 2
     unhealthy_threshold = 2
@@ -100,31 +108,54 @@ resource "aws_lb_listener" "webui_listener" {
 }
 
 resource "aws_lb_target_group" "grafana_tg" {
-  name     = "grafana-tg-t-one"
-  port     = 3000
-  protocol = "HTTP"
-  vpc_id   = aws_vpc.main_vpc.id
+  name        = "grafana-tg-t-one"
+  port        = 3000
+  protocol    = "HTTP"
+  vpc_id      = aws_vpc.main_vpc.id
+  target_type = "ip"
 
   health_check {
     healthy_threshold   = 2
     unhealthy_threshold = 2
     timeout             = 5
     interval            = 30
-    path                = "/healthz"
+    path                = "/"
+  }
+}
+
+resource "aws_lb_listener" "grafana_listener" {
+  load_balancer_arn = aws_lb.ollama_alb.arn
+  port              = 3000
+  protocol          = "HTTP"
+
+  default_action {
+    type             = "forward"
+    target_group_arn = aws_lb_target_group.grafana_tg.arn
   }
 }
 
 resource "aws_lb_target_group" "prometheus_tg" {
-  name     = "prometheus-tg-t-one"
-  port     = 9090
-  protocol = "HTTP"
-  vpc_id   = aws_vpc.main_vpc.id
-
+  name        = "prometheus-tg-t-one"
+  port        = 9090
+  protocol    = "HTTP"
+  vpc_id      = aws_vpc.main_vpc.id
+  target_type = "ip"
   health_check {
     healthy_threshold   = 2
     unhealthy_threshold = 2
     timeout             = 5
     interval            = 30
-    path                = "/-/healthy"
+    path                = "/"
+  }
+}
+
+resource "aws_lb_listener" "prometheus_listener" {
+  load_balancer_arn = aws_lb.ollama_alb.arn
+  port              = 9090
+  protocol          = "HTTP"
+
+  default_action {
+    type             = "forward"
+    target_group_arn = aws_lb_target_group.prometheus_tg.arn
   }
 }

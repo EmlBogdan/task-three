@@ -58,12 +58,12 @@ jobs:
       run: | 
         aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin $ECR_REPOSITORY
 
-    - name: Pull ollama image 
+    - name: Build ollama image 
       id: build-image
       env:
         ECR_REPOSITORY: 324062893129.dkr.ecr.us-east-1.amazonaws.com/ollama-repository
       run: |
-        docker pull ollama/ollama
+        docker build -t ollama -f ollama.Dockerfile
     
     - name: Tag ollama image 
       id: tag-image
@@ -71,8 +71,8 @@ jobs:
         ECR_REPOSITORY: 324062893129.dkr.ecr.us-east-1.amazonaws.com/ollama-repository
         IMAGE_TAG: ollama
       run: |
-        docker tag ollama/ollama:latest ollama/ollama:$IMAGE_TAG
-        docker tag ollama/ollama:${IMAGE_TAG} $ECR_REPOSITORY:${IMAGE_TAG}
+        docker tag ollama:latest ollama/ollama:$IMAGE_TAG
+        docker tag ollama:${IMAGE_TAG} $ECR_REPOSITORY:${IMAGE_TAG}
     
     - name: Pull webui image 
       id: build-webui-image
@@ -90,12 +90,12 @@ jobs:
         docker tag ghcr.io/open-webui/open-webui:main ghcr.io/open-webui/open-webui:$IMAGE_TAG
         docker tag ghcr.io/open-webui/open-webui:${IMAGE_TAG} $ECR_REPOSITORY:${IMAGE_TAG}
 
-    - name: Pull grafana image 
+    - name: Build grafana image 
       id: build-grafana-image
       env:
         ECR_REPOSITORY: 324062893129.dkr.ecr.us-east-1.amazonaws.com/ollama-repository
       run: |
-        docker pull grafana/grafana-enterprise
+        docker build -t grafana -f grafana.Dockerfile
     
     - name: Tag grafana image 
       id: tag-grafana-image
@@ -103,15 +103,15 @@ jobs:
         ECR_REPOSITORY: 324062893129.dkr.ecr.us-east-1.amazonaws.com/ollama-repository
         IMAGE_TAG: grafana
       run: |
-        docker tag grafana/grafana-enterprise:latest grafana/grafana-enterprise:$IMAGE_TAG
-        docker tag grafana/grafana-enterprise:${IMAGE_TAG} $ECR_REPOSITORY:${IMAGE_TAG}
+        docker tag grafana-enterprise:latest grafana/grafana-enterprise:$IMAGE_TAG
+        docker tag grafana-enterprise:${IMAGE_TAG} $ECR_REPOSITORY:${IMAGE_TAG}
 
-    - name: Pull prometheus image 
+    - name: Build prometheus image 
       id: build-prometheus-image
       env:
         ECR_REPOSITORY: 324062893129.dkr.ecr.us-east-1.amazonaws.com/ollama-repository
       run: |
-        docker pull prom/prometheus
+        docker build -t prometheus -f prometheus.Dockerfile
     
     - name: Tag prometheus image 
       id: tag-prometheus-image
