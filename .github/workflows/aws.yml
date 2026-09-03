@@ -63,7 +63,7 @@ jobs:
       env:
         ECR_REPOSITORY: 324062893129.dkr.ecr.us-east-1.amazonaws.com/ollama-repository
       run: |
-        docker build -t ollama -f ollama.Dockerfile
+        docker build -t ollama:ollama -f ollama.Dockerfile .
     
     - name: Tag ollama image 
       id: tag-image
@@ -95,7 +95,7 @@ jobs:
       env:
         ECR_REPOSITORY: 324062893129.dkr.ecr.us-east-1.amazonaws.com/ollama-repository
       run: |
-        docker build -t grafana -f grafana.Dockerfile
+        docker build -t grafana:latest -f grafana.Dockerfile .
     
     - name: Tag grafana image 
       id: tag-grafana-image
@@ -103,15 +103,15 @@ jobs:
         ECR_REPOSITORY: 324062893129.dkr.ecr.us-east-1.amazonaws.com/ollama-repository
         IMAGE_TAG: grafana
       run: |
-        docker tag grafana-enterprise:latest grafana/grafana-enterprise:$IMAGE_TAG
-        docker tag grafana-enterprise:${IMAGE_TAG} $ECR_REPOSITORY:${IMAGE_TAG}
+        docker tag grafana:latest grafana:$IMAGE_TAG
+        docker tag grafana:${IMAGE_TAG} $ECR_REPOSITORY:${IMAGE_TAG}
 
-    - name: Build prometheus image 
+    - name: Pull prometheus image 
       id: build-prometheus-image
       env:
         ECR_REPOSITORY: 324062893129.dkr.ecr.us-east-1.amazonaws.com/ollama-repository
       run: |
-        docker build -t prometheus -f prometheus.Dockerfile
+        docker pull prom/prometheus
     
     - name: Tag prometheus image 
       id: tag-prometheus-image
