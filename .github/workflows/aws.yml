@@ -100,7 +100,7 @@ jobs:
     - name: Pull alerts
       id: pull-alerts-for-prov
       env: 
-        GITHUB_REPO: https://github.com/EmlBogdan/alert_rules . 
+        GITHUB_REPO: https://github.com/EmlBogdan/alert_rules
       run: |
         git clone ${GITHUB_REPO} rules  
       
