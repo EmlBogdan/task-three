@@ -63,7 +63,7 @@ jobs:
       env:
         ECR_REPOSITORY: 324062893129.dkr.ecr.us-east-1.amazonaws.com/ollama-repository
       run: |
-        docker build -t ollama:ollama -f ollama.Dockerfile .
+        docker build -t ollama:latest -f ollama.Dockerfile .
     
     - name: Tag ollama image 
       id: tag-image
