@@ -1,9 +1,8 @@
 resource "aws_efs_file_system" "promeheus-efs" {
   creation_token = "ecs-shared-storage"
 
-  encrypted  = true
-  kms_key_id = aws_kms_key.efs.arn
-
+  encrypted        = true
+  kms_key_id       = aws_kms_key.efs.arn
   performance_mode = "generalPurpose"
 
   throughput_mode = "bursting"
@@ -53,7 +52,7 @@ resource "aws_efs_access_point" "prometheus-data" {
   }
 
   root_directory {
-    path = "/prometheus"
+    path = "/prometheus_0"
 
     creation_info {
       owner_uid   = 65534

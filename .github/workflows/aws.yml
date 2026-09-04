@@ -55,38 +55,6 @@ jobs:
       run: | 
         aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin $ECR_REPOSITORY
 
-    - name: Build ollama image 
-      id: build-image
-      env:
-        ECR_REPOSITORY: 324062893129.dkr.ecr.us-east-1.amazonaws.com/ollama-repository
-      run: |
-        docker build -t ollama:latest -f ollama.Dockerfile .
-    
-    - name: Tag ollama image 
-      id: tag-image
-      env:
-        ECR_REPOSITORY: 324062893129.dkr.ecr.us-east-1.amazonaws.com/ollama-repository
-        IMAGE_TAG: ollama-base-image
-      run: |
-        docker tag ollama:latest ollama:$IMAGE_TAG
-        docker tag ollama:${IMAGE_TAG} $ECR_REPOSITORY:${IMAGE_TAG}
-    
-    - name: Pull webui image 
-      id: build-webui-image
-      env:
-        ECR_REPOSITORY: 324062893129.dkr.ecr.us-east-1.amazonaws.com/ollama-repository
-      run: |
-        docker pull ghcr.io/open-webui/open-webui:main
-    
-    - name: Tag webui image 
-      id: tag-webui-image
-      env:
-        ECR_REPOSITORY: 324062893129.dkr.ecr.us-east-1.amazonaws.com/ollama-repository
-        IMAGE_TAG: webui-base-image
-      run: |
-        docker tag ghcr.io/open-webui/open-webui:main ghcr.io/open-webui/open-webui:$IMAGE_TAG
-        docker tag ghcr.io/open-webui/open-webui:${IMAGE_TAG} $ECR_REPOSITORY:${IMAGE_TAG}
-
     - name: Pull dashboards
       id: pull-dashboards-for-prov
       env: 
@@ -113,26 +81,10 @@ jobs:
       id: tag-grafana-image
       env:
         ECR_REPOSITORY: 324062893129.dkr.ecr.us-east-1.amazonaws.com/ollama-repository
-        IMAGE_TAG: grafana-base-image
+        IMAGE_TAG: grafana
       run: |
         docker tag grafana:latest grafana:$IMAGE_TAG
         docker tag grafana:${IMAGE_TAG} $ECR_REPOSITORY:${IMAGE_TAG}
-
-    - name: Pull prometheus image 
-      id: build-prometheus-image
-      env:
-        ECR_REPOSITORY: 324062893129.dkr.ecr.us-east-1.amazonaws.com/ollama-repository
-      run: |
-        docker pull prom/prometheus
-    
-    - name: Tag prometheus image 
-      id: tag-prometheus-image
-      env:
-        ECR_REPOSITORY: 324062893129.dkr.ecr.us-east-1.amazonaws.com/ollama-repository
-        IMAGE_TAG: prometheus-base-image
-      run: |
-        docker tag prom/prometheus:latest prom/prometheus:$IMAGE_TAG
-        docker tag prom/prometheus:${IMAGE_TAG} $ECR_REPOSITORY:${IMAGE_TAG}
 
 
     - name: Push images
@@ -140,10 +92,27 @@ jobs:
         ECR_REPOSITORY: 324062893129.dkr.ecr.us-east-1.amazonaws.com/ollama-repository
       id: push-images
       run: |
-        docker push ${ECR_REPOSITORY}:ollama-base-image
-        docker push ${ECR_REPOSITORY}:webui-base-image
-        docker push ${ECR_REPOSITORY}:grafana-base-image
-        docker push ${ECR_REPOSITORY}:prometheus-base-image
-      
+        docker push ${ECR_REPOSITORY}:grafana
 
+    - name: Download task definition
+      run: |
+        aws ecs describe-task-definition --task-definition grafana --query taskDefinition > task-definition.json 
+      
+    - name: Fill in the new image ID in the Amazon ECS task definition
+      id: task-def
+      uses: aws-actions/amazon-ecs-render-task-definition@v1
+      env:
+        ECR_REPOSITORY: 324062893129.dkr.ecr.us-east-1.amazonaws.com/ollama-repository
+      with:
+        task-definition: task-definition.json
+        container-name: grafana-container
+        image: "${ECR_REPOSITORY}:grafana"
+      
+    - name: Deploy Amazon ECS task definition
+      uses: aws-actions/amazon-ecs-deploy-task-definition@v2
+      with:
+        task-definition: ${{ steps.task-def.outputs.task-definition }}
+        service: grafana
+        cluster: ollama-cluster
+        wait-for-service-stability: true
 
