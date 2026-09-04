@@ -107,7 +107,10 @@ jobs:
         task-definition: task-definition.json
         container-name: grafana-container
         image: "${{env.ECR_REPOSITORY}}:grafana"
-      
+    
+    - name: Output Run Number
+      run: echo ${{ github.run_number }}
+
     - name: Deploy Amazon ECS task definition
       uses: aws-actions/amazon-ecs-deploy-task-definition@v2
       with:

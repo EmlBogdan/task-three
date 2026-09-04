@@ -15,17 +15,9 @@ resource "aws_vpc_security_group_ingress_rule" "allow_lb_ollama" {
   to_port           = 11434
 }
 
-resource "aws_vpc_security_group_ingress_rule" "allow_lb_webui" {
-  security_group_id = aws_security_group.ollama_alb_sg.id
-  cidr_ipv4         = "0.0.0.0/0"
-  from_port         = 8080
-  ip_protocol       = "tcp"
-  to_port           = 8080
-}
-
 resource "aws_vpc_security_group_ingress_rule" "allow_lb_grafana" {
   security_group_id = aws_security_group.ollama_alb_sg.id
-  cidr_ipv4         = "0.0.0.0/0"
+  cidr_ipv4         = "10.0.0.0/16"
   from_port         = 3000
   ip_protocol       = "tcp"
   to_port           = 3000
@@ -33,10 +25,26 @@ resource "aws_vpc_security_group_ingress_rule" "allow_lb_grafana" {
 
 resource "aws_vpc_security_group_ingress_rule" "allow_lb_prometheus" {
   security_group_id = aws_security_group.ollama_alb_sg.id
-  cidr_ipv4         = "0.0.0.0/0"
+  cidr_ipv4         = "10.0.0.0/16"
   from_port         = 9090
   ip_protocol       = "tcp"
   to_port           = 9090
+}
+
+resource "aws_vpc_security_group_ingress_rule" "allow_lb_https" {
+  security_group_id = aws_security_group.ollama_alb_sg.id
+  cidr_ipv4         = "0.0.0.0/0"
+  from_port         = 443
+  ip_protocol       = "tcp"
+  to_port           = 443
+}
+
+resource "aws_vpc_security_group_ingress_rule" "allow_lb_http" {
+  security_group_id = aws_security_group.ollama_alb_sg.id
+  cidr_ipv4         = "0.0.0.0/0"
+  from_port         = 80
+  ip_protocol       = "tcp"
+  to_port           = 80
 }
 
 resource "aws_vpc_security_group_egress_rule" "allow_all_outcoming_traffic_ipv4" {
@@ -96,17 +104,6 @@ resource "aws_lb_target_group" "webui_tg" {
   }
 }
 
-resource "aws_lb_listener" "webui_listener" {
-  load_balancer_arn = aws_lb.ollama_alb.arn
-  port              = 8080
-  protocol          = "HTTP"
-
-  default_action {
-    type             = "forward"
-    target_group_arn = aws_lb_target_group.webui_tg.arn
-  }
-}
-
 resource "aws_lb_target_group" "grafana_tg" {
   name        = "grafana-tg-t-one"
   port        = 3000
@@ -120,17 +117,6 @@ resource "aws_lb_target_group" "grafana_tg" {
     timeout             = 5
     interval            = 30
     path                = "/healthz"
-  }
-}
-
-resource "aws_lb_listener" "grafana_listener" {
-  load_balancer_arn = aws_lb.ollama_alb.arn
-  port              = 3000
-  protocol          = "HTTP"
-
-  default_action {
-    type             = "forward"
-    target_group_arn = aws_lb_target_group.grafana_tg.arn
   }
 }
 
@@ -149,13 +135,3 @@ resource "aws_lb_target_group" "prometheus_tg" {
   }
 }
 
-resource "aws_lb_listener" "prometheus_listener" {
-  load_balancer_arn = aws_lb.ollama_alb.arn
-  port              = 9090
-  protocol          = "HTTP"
-
-  default_action {
-    type             = "forward"
-    target_group_arn = aws_lb_target_group.prometheus_tg.arn
-  }
-}

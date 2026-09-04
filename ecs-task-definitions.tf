@@ -74,7 +74,7 @@ resource "aws_ecs_task_definition" "ollama_task_definition" {
           global: 
             scrape_interval: 15s 
             remote_write: 
-              - url: http://${aws_lb.ollama_alb.dns_name}:9090/api/v1/write
+              - url: https://prometheus.universal-domain.online/api/v1/write
           configs: 
             - name: llm-agent 
               scrape_configs: 
@@ -136,7 +136,7 @@ resource "aws_ecs_task_definition" "grafana_task_definition" {
             type: prometheus
             uid: prometheus-ds
             access: proxy
-            url: http://${aws_lb.ollama_alb.dns_name}:9090
+            url: https://prometheus.universal-domain.online/
             jsonData:
               httpMethod: POST
               timeInterval: 15s
