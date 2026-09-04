@@ -106,7 +106,7 @@ jobs:
       with:
         task-definition: task-definition.json
         container-name: grafana-container
-        image: "${ECR_REPOSITORY}:grafana"
+        image: "${{env.ECR_REPOSITORY}}:grafana"
       
     - name: Deploy Amazon ECS task definition
       uses: aws-actions/amazon-ecs-deploy-task-definition@v2
