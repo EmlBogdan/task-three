@@ -99,16 +99,16 @@ jobs:
       env:
         ECR_REPOSITORY: 324062893129.dkr.ecr.us-east-1.amazonaws.com/ollama-repository
       run: |
-        docker build -t alertmanager:latest -f images/alertmanager.Dockerfile .
+        docker build -t grafana_agent:latest -f images/grafana_agent.Dockerfile .
     
     - name: Tag grafana image 
       id: tag-grafana-image
       env:
         ECR_REPOSITORY: 324062893129.dkr.ecr.us-east-1.amazonaws.com/ollama-repository
-        IMAGE_TAG: alertmanager
+        IMAGE_TAG: grafana_agent
       run: |
-        docker tag alertmanager:latest alertmanager:$IMAGE_TAG
-        docker tag alertmanager:${IMAGE_TAG} $ECR_REPOSITORY:${IMAGE_TAG}
+        docker tag grafana_agent:latest grafana_agent:$IMAGE_TAG
+        docker tag grafana_agent:${IMAGE_TAG} $ECR_REPOSITORY:${IMAGE_TAG}
 
 
     - name: Push images
@@ -116,7 +116,7 @@ jobs:
         ECR_REPOSITORY: 324062893129.dkr.ecr.us-east-1.amazonaws.com/ollama-repository
       id: push-images
       run: |
-        docker push ${ECR_REPOSITORY}:alertmanager
+        docker push ${ECR_REPOSITORY}:grafana_agent
     
     
 
