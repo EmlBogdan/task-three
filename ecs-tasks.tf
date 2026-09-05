@@ -160,7 +160,7 @@ resource "aws_ecs_service" "prometheus-service" {
   task_definition                    = aws_ecs_task_definition.prometheus_task_definition.arn
   desired_count                      = 1
   launch_type                        = "FARGATE"
-  deployment_maximum_percent         = 100
+  deployment_maximum_percent         = 200
   deployment_minimum_healthy_percent = 0
   load_balancer {
     target_group_arn = aws_lb_target_group.prometheus_tg.arn
