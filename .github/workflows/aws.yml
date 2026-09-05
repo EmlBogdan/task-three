@@ -87,12 +87,38 @@ jobs:
         docker tag grafana:${IMAGE_TAG} $ECR_REPOSITORY:${IMAGE_TAG}
 
 
-    # - name: Push images
-    #   env:
-    #     ECR_REPOSITORY: 324062893129.dkr.ecr.us-east-1.amazonaws.com/ollama-repository
-    #   id: push-images
-    #   run: |
-    #     docker push ${ECR_REPOSITORY}:grafana
+    - name: Push images
+      env:
+        ECR_REPOSITORY: 324062893129.dkr.ecr.us-east-1.amazonaws.com/ollama-repository
+      id: push-images
+      run: |
+        docker push ${ECR_REPOSITORY}:grafana
+
+    - name: Build grafana image 
+      id: build-grafana-image
+      env:
+        ECR_REPOSITORY: 324062893129.dkr.ecr.us-east-1.amazonaws.com/ollama-repository
+      run: |
+        docker build -t alertmanager:latest -f images/alertmanager.Dockerfile .
+    
+    - name: Tag grafana image 
+      id: tag-grafana-image
+      env:
+        ECR_REPOSITORY: 324062893129.dkr.ecr.us-east-1.amazonaws.com/ollama-repository
+        IMAGE_TAG: alertmanager
+      run: |
+        docker tag alertmanager:latest alertmanager:$IMAGE_TAG
+        docker tag alertmanager:${IMAGE_TAG} $ECR_REPOSITORY:${IMAGE_TAG}
+
+
+    - name: Push images
+      env:
+        ECR_REPOSITORY: 324062893129.dkr.ecr.us-east-1.amazonaws.com/ollama-repository
+      id: push-images
+      run: |
+        docker push ${ECR_REPOSITORY}:alertmanager
+    
+    
 
     # - name: Download task definition
     #   run: |
