@@ -55,44 +55,44 @@ jobs:
       run: | 
         aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin $ECR_REPOSITORY
 
-    - name: Pull dashboards
-      id: pull-dashboards-for-prov
-      env: 
-        GITHUB_REPO: https://github.com/EmlBogdan/dashboards
-      run: |
-        git clone ${GITHUB_REPO} dashboards
+    # - name: Pull dashboards
+    #   id: pull-dashboards-for-prov
+    #   env: 
+    #     GITHUB_REPO: https://github.com/EmlBogdan/dashboards
+    #   run: |
+    #     git clone ${GITHUB_REPO} dashboards
       
-    - name: Pull alerts
-      id: pull-alerts-for-prov
-      env: 
-        GITHUB_REPO: https://github.com/EmlBogdan/alert_rules
-      run: |
-        git clone ${GITHUB_REPO} rules  
+    # - name: Pull alerts
+    #   id: pull-alerts-for-prov
+    #   env: 
+    #     GITHUB_REPO: https://github.com/EmlBogdan/alert_rules
+    #   run: |
+    #     git clone ${GITHUB_REPO} rules  
       
 
-    - name: Build grafana image 
-      id: build-grafana-image
-      env:
-        ECR_REPOSITORY: 324062893129.dkr.ecr.us-east-1.amazonaws.com/ollama-repository
-      run: |
-        docker build -t grafana:latest -f images/grafana.Dockerfile .
+    # - name: Build grafana image 
+    #   id: build-grafana-image
+    #   env:
+    #     ECR_REPOSITORY: 324062893129.dkr.ecr.us-east-1.amazonaws.com/ollama-repository
+    #   run: |
+    #     docker build -t grafana:latest -f images/grafana.Dockerfile .
     
-    - name: Tag grafana image 
-      id: tag-grafana-image
-      env:
-        ECR_REPOSITORY: 324062893129.dkr.ecr.us-east-1.amazonaws.com/ollama-repository
-        IMAGE_TAG: grafana
-      run: |
-        docker tag grafana:latest grafana:$IMAGE_TAG
-        docker tag grafana:${IMAGE_TAG} $ECR_REPOSITORY:${IMAGE_TAG}
+    # - name: Tag grafana image 
+    #   id: tag-grafana-image
+    #   env:
+    #     ECR_REPOSITORY: 324062893129.dkr.ecr.us-east-1.amazonaws.com/ollama-repository
+    #     IMAGE_TAG: grafana
+    #   run: |
+    #     docker tag grafana:latest grafana:$IMAGE_TAG
+    #     docker tag grafana:${IMAGE_TAG} $ECR_REPOSITORY:${IMAGE_TAG}
 
 
-    - name: Push images
-      env:
-        ECR_REPOSITORY: 324062893129.dkr.ecr.us-east-1.amazonaws.com/ollama-repository
-      id: push-images
-      run: |
-        docker push ${ECR_REPOSITORY}:grafana
+    # - name: Push images
+    #   env:
+    #     ECR_REPOSITORY: 324062893129.dkr.ecr.us-east-1.amazonaws.com/ollama-repository
+    #   id: push-images
+    #   run: |
+    #     docker push ${ECR_REPOSITORY}:grafana
 
     - name: Build grafana image 
       id: build-grafana-image
