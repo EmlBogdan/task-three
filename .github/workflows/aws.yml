@@ -55,19 +55,19 @@ jobs:
       run: | 
         aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin $ECR_REPOSITORY
 
-    # - name: Pull dashboards
-    #   id: pull-dashboards-for-prov
-    #   env: 
-    #     GITHUB_REPO: https://github.com/EmlBogdan/dashboards
-    #   run: |
-    #     git clone ${GITHUB_REPO} dashboards
+    - name: Pull dashboards
+      id: pull-dashboards-for-prov
+      env: 
+        GITHUB_REPO: https://github.com/EmlBogdan/dashboards
+      run: |
+        git clone ${GITHUB_REPO} dashboards
       
-    # - name: Pull alerts
-    #   id: pull-alerts-for-prov
-    #   env: 
-    #     GITHUB_REPO: https://github.com/EmlBogdan/alert_rules
-    #   run: |
-    #     git clone ${GITHUB_REPO} rules  
+    - name: Pull alerts
+      id: pull-alerts-for-prov
+      env: 
+        GITHUB_REPO: https://github.com/EmlBogdan/alert_rules
+      run: |
+        git clone ${GITHUB_REPO} rules  
       
 
     # - name: Build grafana image 
