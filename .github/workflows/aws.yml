@@ -99,7 +99,7 @@ jobs:
       env:
         ECR_REPOSITORY: 324062893129.dkr.ecr.us-east-1.amazonaws.com/ollama-repository
       run: |
-        docker build -t grafana-agent:latest -f images/grafana-agent.Dockerfile .
+        docker build -t grafana-agent:latest -f images/grafana_agent.Dockerfile .
     
     - name: Tag grafana image 
       id: tag-grafana-image
