@@ -10,3 +10,4 @@ terraform.rc
 *.tfvars
 *.tfvars.json
 jump_conf.sh
+.terraform.lock.hcl

@@ -1,0 +1,19 @@
+global:
+  smtp_smarthost: 'smtp.gmail.com:587'
+  smtp_from: 'alertfromalertman@gmail.com'
+  smtp_auth_username: 'alertfromalertman@gmail.com'
+  smtp_auth_password: 'efsxtyfpdsjtjbij'
+  smtp_require_tls: true
+
+route:
+  group_by: ['alertname', 'instance']
+  group_wait: 30s
+  group_interval: 5m
+  repeat_interval: 4h
+  receiver: 'bieme'
+
+receivers:
+  - name: 'bieme'
+    email_configs:
+      - to: 'bieme@softserveinc.com'
+        send_resolved: true

@@ -36,6 +36,26 @@ resource "aws_lb_listener" "https_listener" {
   }
 }
 
+resource "aws_lb_listener_rule" "ollama_listener_rule" {
+  listener_arn = aws_lb_listener.https_listener.arn
+  priority     = 50
+  action {
+    type             = "forward"
+    target_group_arn = aws_lb_target_group.llm_tg.arn
+  }
+
+  condition {
+    host_header {
+      values = ["ollama.universal-domain.online"]
+    }
+  }
+
+  condition {
+    source_ip {
+      values = ["${aws_nat_gateway.nat.public_ip}/32"]
+    }
+  }
+}
 
 resource "aws_lb_listener_rule" "grafana_listener_rule" {
   listener_arn = aws_lb_listener.https_listener.arn
@@ -53,7 +73,7 @@ resource "aws_lb_listener_rule" "grafana_listener_rule" {
 
   condition {
     source_ip {
-      values = [var.my_ip, "10.0.0.0/16"]
+      values = [var.my_ip, "${aws_nat_gateway.nat.public_ip}/32"]
     }
   }
 }
@@ -89,7 +109,7 @@ resource "aws_lb_listener_rule" "prometheus_listener_rule" {
 
   condition {
     source_ip {
-      values = [var.my_ip, "10.0.0.0/16"]
+      values = [var.my_ip, "${aws_nat_gateway.nat.public_ip}/32"]
     }
   }
 }

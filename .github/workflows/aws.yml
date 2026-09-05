@@ -87,35 +87,33 @@ jobs:
         docker tag grafana:${IMAGE_TAG} $ECR_REPOSITORY:${IMAGE_TAG}
 
 
-    - name: Push images
-      env:
-        ECR_REPOSITORY: 324062893129.dkr.ecr.us-east-1.amazonaws.com/ollama-repository
-      id: push-images
-      run: |
-        docker push ${ECR_REPOSITORY}:grafana
+    # - name: Push images
+    #   env:
+    #     ECR_REPOSITORY: 324062893129.dkr.ecr.us-east-1.amazonaws.com/ollama-repository
+    #   id: push-images
+    #   run: |
+    #     docker push ${ECR_REPOSITORY}:grafana
 
-    - name: Download task definition
-      run: |
-        aws ecs describe-task-definition --task-definition grafana --query taskDefinition > task-definition.json 
+    # - name: Download task definition
+    #   run: |
+    #     aws ecs describe-task-definition --task-definition grafana --query taskDefinition > task-definition.json 
       
-    - name: Fill in the new image ID in the Amazon ECS task definition
-      id: task-def
-      uses: aws-actions/amazon-ecs-render-task-definition@v1
-      env:
-        ECR_REPOSITORY: 324062893129.dkr.ecr.us-east-1.amazonaws.com/ollama-repository
-      with:
-        task-definition: task-definition.json
-        container-name: grafana-container
-        image: "${{env.ECR_REPOSITORY}}:grafana"
+    # - name: Fill in the new image ID in the Amazon ECS task definition
+    #   id: task-def
+    #   uses: aws-actions/amazon-ecs-render-task-definition@v1
+    #   env:
+    #     ECR_REPOSITORY: 324062893129.dkr.ecr.us-east-1.amazonaws.com/ollama-repository
+    #   with:
+    #     task-definition: task-definition.json
+    #     container-name: grafana-container
+    #     image: "${{env.ECR_REPOSITORY}}:grafana"
     
-    - name: Output Run Number
-      run: echo ${{ github.run_number }}
 
-    - name: Deploy Amazon ECS task definition
-      uses: aws-actions/amazon-ecs-deploy-task-definition@v2
-      with:
-        task-definition: ${{ steps.task-def.outputs.task-definition }}
-        service: grafana
-        cluster: ollama-cluster
-        wait-for-service-stability: true
+    # - name: Deploy Amazon ECS task definition
+    #   uses: aws-actions/amazon-ecs-deploy-task-definition@v2
+    #   with:
+    #     task-definition: ${{ steps.task-def.outputs.task-definition }}
+    #     service: grafana
+    #     cluster: ollama-cluster
+    #     wait-for-service-stability: true
 

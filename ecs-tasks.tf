@@ -155,12 +155,13 @@ resource "aws_vpc_security_group_egress_rule" "allow_all_traffic_ipv4_ecs_grafan
 }
 
 resource "aws_ecs_service" "prometheus-service" {
-  name            = "prometheus"
-  cluster         = aws_ecs_cluster.ollama-cluster.id
-  task_definition = aws_ecs_task_definition.prometheus_task_definition.arn
-  desired_count   = 1
-  launch_type     = "FARGATE"
-
+  name                               = "prometheus"
+  cluster                            = aws_ecs_cluster.ollama-cluster.id
+  task_definition                    = aws_ecs_task_definition.prometheus_task_definition.arn
+  desired_count                      = 1
+  launch_type                        = "FARGATE"
+  deployment_maximum_percent         = 100
+  deployment_minimum_healthy_percent = 0
   load_balancer {
     target_group_arn = aws_lb_target_group.prometheus_tg.arn
     container_name   = "prometheus-container"
