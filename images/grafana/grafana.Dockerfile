@@ -5,7 +5,7 @@ COPY --chown=grafana:grafana images/grafana/datasources.yaml /etc/grafana/provis
 COPY --chown=grafana:grafana dashboards /var/lib/grafana/dashboards
 COPY --chown=grafana:grafana rules /etc/grafana/provisioning/alerting
 
-CMD []
+CMD [./run.sh]
 
 
 
