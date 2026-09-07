@@ -47,19 +47,94 @@ jobs:
             src:
               - 'images/ollama/**'
 
-      - name: Build step
+      - name: Build ollama
         if: steps.changes.outputs.src == 'true'
-        run: echo "hello world 1"    
-
+        id: build-ollama-image
+        run: |
+          docker build -t ollama:latest -f images/ollama/ollama.Dockerfile .  
+          docker save -o ollama-image.tar ollama:latest
+      
+      - name: Upload ollama image
+        if: steps.changes.outputs.src == 'true'
+        id: upload-ollama-image
+        uses: actions/upload-artifact@v4
+        with: 
+          name: ollama-docker-image
+          path: ollama-image.tar
+          retention-days: 1
 
   deploy-ollama:
-    name: Build ollama
+    name: Deploy ollama
+    permissions:
+      id-token: write
+      contents: read
     runs-on: ubuntu-latest
     needs: build-ollama
     if: needs.build-ollama.outputs.is_changed == 'true'
     steps:
-      - name: build-ollama
-        run: echo "hello world 2"
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Download image artifact
+        uses: actions/download-artifact@v4
+        with: 
+          name: ollama-docker-image
+
+      - name: Load Docker image
+        run: docker load -i ollama-image.tar
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v6.2.3
+        with:
+          role-to-assume: ${{secrets.AWS_IAM_ROLE}}
+          aws-region: us-east-1
+          role-session-name: GHActionsSession
+
+      - name: Login to Amazon ECR
+        id: login-ecr
+        env:
+          ECR_REPOSITORY: 324062893129.dkr.ecr.us-east-1.amazonaws.com/ollama-repository
+        run: | 
+          aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin $ECR_REPOSITORY
+
+      - name: Tag ollama image 
+        id: tag-ollama-image
+        env:
+          ECR_REPOSITORY: 324062893129.dkr.ecr.us-east-1.amazonaws.com/ollama-repository
+          IMAGE_TAG: ollama
+        run: |
+          docker tag ollama:latest ollama:$IMAGE_TAG
+          docker tag ollama:${IMAGE_TAG} $ECR_REPOSITORY:${IMAGE_TAG}
+
+      - name: Push images
+        env:
+          ECR_REPOSITORY: 324062893129.dkr.ecr.us-east-1.amazonaws.com/ollama-repository
+        id: push-images
+        run: |
+          docker push ${ECR_REPOSITORY}:ollama
+
+      - name: Download task definition
+        run: |
+          aws ecs describe-task-definition --task-definition ollama --query taskDefinition > task-definition.json 
+        
+      - name: Fill in the new image ID in the Amazon ECS task definition
+        id: task-def
+        uses: aws-actions/amazon-ecs-render-task-definition@v1
+        env:
+          ECR_REPOSITORY: 324062893129.dkr.ecr.us-east-1.amazonaws.com/ollama-repository
+        with:
+          task-definition: task-definition.json
+          container-name: ollama-container
+          image: "${{env.ECR_REPOSITORY}}:ollama"
+      
+
+      - name: Deploy Amazon ECS task definition
+        uses: aws-actions/amazon-ecs-deploy-task-definition@v2
+        with:
+          task-definition: ${{ steps.task-def.outputs.task-definition }}
+          service: ollama
+          cluster: ollama-cluster
+          wait-for-service-stability: true
 
 
 
@@ -70,37 +145,6 @@ jobs:
 
 
 
-
-
-
-
-
-
-# jobs:
-#   deploy:
-#     name: Build ollama
-#     runs-on: ubuntu-latest
-#     permissions:
-#       id-token: write
-#       contents: read
-#     steps:
-#     - name: Checkout code
-#       uses: actions/checkout@v4
-
-#     - name: Configure AWS credentials
-#       uses: aws-actions/configure-aws-credentials@v6.2.3
-#       with:
-#         role-to-assume: ${{secrets.AWS_IAM_ROLE}}
-#         aws-region: us-east-1
-#         role-session-name: GHActionsSession
-
-
-#     - name: Login to Amazon ECR
-#       id: login-ecr
-#       env:
-#         ECR_REPOSITORY: 324062893129.dkr.ecr.us-east-1.amazonaws.com/ollama-repository
-#       run: | 
-#         aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin $ECR_REPOSITORY
 
     # - name: Pull dashboards
     #   id: pull-dashboards-for-prov
@@ -117,29 +161,8 @@ jobs:
     #     git clone ${GITHUB_REPO} rules  
       
 
-    # - name: Build grafana image 
-    #   id: build-grafana-image
-    #   env:
-    #     ECR_REPOSITORY: 324062893129.dkr.ecr.us-east-1.amazonaws.com/ollama-repository
-    #   run: |
-    #     docker build -t grafana:latest -f images/grafana.Dockerfile .
+
     
-    # - name: Tag grafana image 
-    #   id: tag-grafana-image
-    #   env:
-    #     ECR_REPOSITORY: 324062893129.dkr.ecr.us-east-1.amazonaws.com/ollama-repository
-    #     IMAGE_TAG: grafana
-    #   run: |
-    #     docker tag grafana:latest grafana:$IMAGE_TAG
-    #     docker tag grafana:${IMAGE_TAG} $ECR_REPOSITORY:${IMAGE_TAG}
-
-
-    # - name: Push images
-    #   env:
-    #     ECR_REPOSITORY: 324062893129.dkr.ecr.us-east-1.amazonaws.com/ollama-repository
-    #   id: push-images
-    #   run: |
-    #     docker push ${ECR_REPOSITORY}:grafana
 
     # - name: Build grafana image 
     #   id: build-grafana-image
@@ -167,26 +190,5 @@ jobs:
     
     
 
-    # - name: Download task definition
-    #   run: |
-    #     aws ecs describe-task-definition --task-definition grafana --query taskDefinition > task-definition.json 
-      
-    # - name: Fill in the new image ID in the Amazon ECS task definition
-    #   id: task-def
-    #   uses: aws-actions/amazon-ecs-render-task-definition@v1
-    #   env:
-    #     ECR_REPOSITORY: 324062893129.dkr.ecr.us-east-1.amazonaws.com/ollama-repository
-    #   with:
-    #     task-definition: task-definition.json
-    #     container-name: grafana-container
-    #     image: "${{env.ECR_REPOSITORY}}:grafana"
     
-
-    # - name: Deploy Amazon ECS task definition
-    #   uses: aws-actions/amazon-ecs-deploy-task-definition@v2
-    #   with:
-    #     task-definition: ${{ steps.task-def.outputs.task-definition }}
-    #     service: grafana
-    #     cluster: ollama-cluster
-    #     wait-for-service-stability: true
 
