@@ -1,12 +1,3 @@
-data "aws_secretsmanager_secret_version" "db_credentials" {
-  secret_id = "db_creds"
-}
-
-locals {
-  db_creds = jsondecode(
-    data.aws_secretsmanager_secret_version.db_credentials.secret_string
-  )
-}
 
 resource "aws_db_instance" "postgres" {
   identifier             = "ollama-postgres"
@@ -19,9 +10,10 @@ resource "aws_db_instance" "postgres" {
   multi_az               = true
   db_subnet_group_name   = aws_db_subnet_group.ollama_db_group.name
 
-  db_name  = "openwebui"
-  username = local.db_creds.username
-  password = local.db_creds.password
+  db_name                     = "openwebui"
+  username                    = "postgres"
+  manage_master_user_password = true
+
 }
 
 resource "aws_db_subnet_group" "ollama_db_group" {
@@ -53,8 +45,4 @@ resource "aws_vpc_security_group_egress_rule" "allow_all_traffic" {
   ip_protocol       = "-1"
 }
 
-output "postgres_endpoint" {
-  description = "PostgreSQL connection endpoint"
-  value       = aws_db_instance.postgres.endpoint
-}
 

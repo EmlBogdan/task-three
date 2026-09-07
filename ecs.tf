@@ -29,11 +29,12 @@ resource "aws_iam_role_policy" "ecs_secrets_policy" {
     Statement = [
       {
         Action = [
-          "secretsmanager:GetSecretValue"
+          "secretsmanager:GetSecretValue",
+          "kms:Decrypt"
         ]
         Effect = "Allow"
         Resource = [
-          aws_secretsmanager_secret.db_url.arn
+          aws_db_instance.postgres.master_user_secret[0].secret_arn
         ]
       }
     ]
@@ -55,7 +56,7 @@ resource "aws_secretsmanager_secret" "db_url" {
   recovery_window_in_days = 0
 }
 
-resource "aws_secretsmanager_secret_version" "db_url_value" {
-  secret_id     = aws_secretsmanager_secret.db_url.id
-  secret_string = "postgresql://${aws_db_instance.postgres.username}:${urlencode(aws_db_instance.postgres.password)}@${aws_db_instance.postgres.endpoint}/openwebui"
-}
+# resource "aws_secretsmanager_secret_version" "db_url_value" {
+#   secret_id     = aws_secretsmanager_secret.db_url.id
+#   secret_string = "postgresql://${aws_db_instance.postgres.username}:${urlencode(aws_db_instance.postgres.password)}@${aws_db_instance.postgres.endpoint}/openwebui"
+# }

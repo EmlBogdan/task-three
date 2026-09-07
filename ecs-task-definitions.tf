@@ -13,17 +13,31 @@ resource "aws_ecs_task_definition" "webui_task_definition" {
         {
           name  = "OLLAMA_BASE_URL"
           value = "https://ollama.universal-domain.online"
+        },
+        {
+          name  = "DB_HOST"
+          value = "${aws_db_instance.postgres.address}"
+        },
+        {
+          name  = "DB_NAME"
+          value = "${aws_db_instance.postgres.db_name}"
         }
       ]
       secrets = [
         {
-          name      = "DATABASE_URL"
-          valueFrom = aws_secretsmanager_secret.db_url.arn
+          name      = "DB_USER"
+          valueFrom = "${aws_db_instance.postgres.master_user_secret[0].secret_arn}:username::"
+        },
+        {
+          name      = "DB_PASS"
+          valueFrom = "${aws_db_instance.postgres.master_user_secret[0].secret_arn}:password::"
         }
       ]
-      cpu       = 1024
-      memory    = 2048
-      essential = true
+      entryPoint = ["sh", "-c"]
+      command    = ["export DATABASE_URL=\"postgresql://$DB_USER:$DB_PASS@$DB_HOST:5432/$DB_NAME\" && bash start.sh"]
+      cpu        = 1024
+      memory     = 2048
+      essential  = true
       portMappings = [
         {
           containerPort = 8080
