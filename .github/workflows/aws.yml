@@ -59,6 +59,7 @@ jobs:
           docker save -o ollama-image.tar ollama:latest
 
       - name: Configure AWS credentials
+        if: steps.changes.outputs.src == 'true'
         uses: aws-actions/configure-aws-credentials@v6.2.3
         with:
           role-to-assume: ${{secrets.AWS_IAM_ROLE}}
@@ -66,6 +67,7 @@ jobs:
           role-session-name: GHActionsSession
 
       - name: Login to Amazon ECR
+        if: steps.changes.outputs.src == 'true'
         id: login-ecr
         env:
           ECR_REPOSITORY: 324062893129.dkr.ecr.us-east-1.amazonaws.com/ollama-repository
@@ -73,6 +75,7 @@ jobs:
           aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin $ECR_REPOSITORY
 
       - name: Tag ollama image 
+        if: steps.changes.outputs.src == 'true'
         id: tag-ollama-image
         env:
           ECR_REPOSITORY: 324062893129.dkr.ecr.us-east-1.amazonaws.com/ollama-repository
@@ -82,6 +85,7 @@ jobs:
           docker tag ${IMAGE_TAG} $ECR_REPOSITORY:${IMAGE_TAG}
 
       - name: Push images
+        if: steps.changes.outputs.src == 'true'
         env:
           ECR_REPOSITORY: 324062893129.dkr.ecr.us-east-1.amazonaws.com/ollama-repository
         id: push-images
@@ -166,6 +170,7 @@ jobs:
           docker save -o grafana-image.tar grafana:latest
       
       - name: Configure AWS credentials
+        if: steps.changes.outputs.src == 'true'
         uses: aws-actions/configure-aws-credentials@v6.2.3
         with:
           role-to-assume: ${{secrets.AWS_IAM_ROLE}}
@@ -173,6 +178,7 @@ jobs:
           role-session-name: GHActionsSession
 
       - name: Login to Amazon ECR
+        if: steps.changes.outputs.src == 'true'
         id: login-ecr
         env:
           ECR_REPOSITORY: 324062893129.dkr.ecr.us-east-1.amazonaws.com/ollama-repository
@@ -180,6 +186,7 @@ jobs:
           aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin $ECR_REPOSITORY
 
       - name: Tag grafana image 
+        if: steps.changes.outputs.src == 'true'
         id: tag-grafana-image
         env:
           ECR_REPOSITORY: 324062893129.dkr.ecr.us-east-1.amazonaws.com/ollama-repository
@@ -189,6 +196,7 @@ jobs:
           docker tag ${IMAGE_TAG} $ECR_REPOSITORY:${IMAGE_TAG}
 
       - name: Push images
+        if: steps.changes.outputs.src == 'true'
         env:
           ECR_REPOSITORY: 324062893129.dkr.ecr.us-east-1.amazonaws.com/ollama-repository
         id: push-images
@@ -257,6 +265,7 @@ jobs:
           docker save -o prometheus-image.tar prometheus:latest
 
       - name: Configure AWS credentials
+        if: steps.changes.outputs.src == 'true'
         uses: aws-actions/configure-aws-credentials@v6.2.3
         with:
           role-to-assume: ${{secrets.AWS_IAM_ROLE}}
@@ -264,6 +273,7 @@ jobs:
           role-session-name: GHActionsSession
 
       - name: Login to Amazon ECR
+        if: steps.changes.outputs.src == 'true'
         id: login-ecr
         env:
           ECR_REPOSITORY: 324062893129.dkr.ecr.us-east-1.amazonaws.com/ollama-repository
@@ -271,6 +281,7 @@ jobs:
           aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin $ECR_REPOSITORY
 
       - name: Tag prometheus image 
+        if: steps.changes.outputs.src == 'true'
         id: tag-prometheus-image
         env:
           ECR_REPOSITORY: 324062893129.dkr.ecr.us-east-1.amazonaws.com/ollama-repository
@@ -280,6 +291,7 @@ jobs:
           docker tag ${IMAGE_TAG} $ECR_REPOSITORY:${IMAGE_TAG}
 
       - name: Push images
+        if: steps.changes.outputs.src == 'true'
         env:
           ECR_REPOSITORY: 324062893129.dkr.ecr.us-east-1.amazonaws.com/ollama-repository
         id: push-images
