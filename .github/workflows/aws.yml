@@ -216,13 +216,13 @@ jobs:
       id-token: write
       contents: read
     runs-on: ubuntu-latest
+    if: needs.build-ollama.outputs.is_changed == 'true'
     needs: build-grafana
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
       - name: Configure AWS credentials
-        if: steps.changes.outputs.src == 'true'
         uses: aws-actions/configure-aws-credentials@v6.2.3
         with:
           role-to-assume: ${{secrets.AWS_IAM_ROLE}}
