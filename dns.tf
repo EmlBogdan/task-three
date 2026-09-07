@@ -52,7 +52,7 @@ resource "aws_lb_listener_rule" "ollama_listener_rule" {
 
   condition {
     source_ip {
-      values = ["${aws_nat_gateway.nat.public_ip}/32"]
+      values = ["${aws_nat_gateway.nat.public_ip}/32", "10.0.0.0/16"]
     }
   }
 }
@@ -122,7 +122,7 @@ data "aws_route53_zone" "ollama_zone" {
 }
 
 resource "aws_route53_record" "subdomains" {
-  for_each = toset(["grafana", "prometheus"])
+  for_each = toset(["grafana", "prometheus", "ollama"])
   zone_id  = data.aws_route53_zone.ollama_zone.id
   name     = "${each.key}.${data.aws_route53_zone.ollama_zone.name}"
   type     = "A"

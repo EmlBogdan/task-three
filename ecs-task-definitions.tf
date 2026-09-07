@@ -9,6 +9,12 @@ resource "aws_ecs_task_definition" "webui_task_definition" {
     {
       name  = "webui-container"
       image = "${data.aws_ecr_repository.ollama-repository.repository_url}:webui-base-image"
+      environment = [
+        {
+          name  = "OLLAMA_BASE_URL"
+          value = "https://ollama.universal-domain.online"
+        }
+      ]
       secrets = [
         {
           name      = "DATABASE_URL"
