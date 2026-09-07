@@ -165,7 +165,7 @@ jobs:
         with:
           filters: |
             src:
-              - 'images/grafana/**'
+              - 'images/prometheus/**'
 
       - name: Pull dashboards
         id: pull-dashboards-for-prov
