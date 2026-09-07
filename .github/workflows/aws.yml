@@ -103,6 +103,14 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+      
+      - name: Configure AWS credentials
+        if: steps.changes.outputs.src == 'true'
+        uses: aws-actions/configure-aws-credentials@v6.2.3
+        with:
+          role-to-assume: ${{secrets.AWS_IAM_ROLE}}
+          aws-region: us-east-1
+          role-session-name: GHActionsSession
 
       - name: Download task definition
         run: |
@@ -215,6 +223,14 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
+      - name: Configure AWS credentials
+        if: steps.changes.outputs.src == 'true'
+        uses: aws-actions/configure-aws-credentials@v6.2.3
+        with:
+          role-to-assume: ${{secrets.AWS_IAM_ROLE}}
+          aws-region: us-east-1
+          role-session-name: GHActionsSession
+
       - name: Download task definition
         run: |
           aws ecs describe-task-definition --task-definition grafana --query taskDefinition > task-definition.json 
@@ -309,6 +325,14 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+
+      - name: Configure AWS credentials
+        if: steps.changes.outputs.src == 'true'
+        uses: aws-actions/configure-aws-credentials@v6.2.3
+        with:
+          role-to-assume: ${{secrets.AWS_IAM_ROLE}}
+          aws-region: us-east-1
+          role-session-name: GHActionsSession
 
       - name: Download task definition
         run: |
