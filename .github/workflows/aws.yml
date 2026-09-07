@@ -91,7 +91,7 @@ jobs:
           ECR_REPOSITORY: 324062893129.dkr.ecr.us-east-1.amazonaws.com/ollama-repository
           IMAGE_TAG: ollama_${{github.ref_name}}
         with:
-          image-ref: "${{ env.ECR_REPOSITORY }}:$IMAGE_TAG"
+          image-ref: "${{ env.ECR_REPOSITORY }}:${{ env.IMAGE_TAG }}"
           format: 'table'
           exit_code: 0
           ignore-unfixed: true
@@ -222,12 +222,12 @@ jobs:
           ECR_REPOSITORY: 324062893129.dkr.ecr.us-east-1.amazonaws.com/ollama-repository
           IMAGE_TAG: grafana_${{github.ref_name}}
         with:
-          image-ref: "${{ env.ECR_REPOSITORY }}:$IMAGE_TAG"
+          image-ref: "${{ env.ECR_REPOSITORY }}:${{ env.IMAGE_TAG }}"
           format: 'table'
-          exit_code: 0
+          exit-code: 0
           ignore-unfixed: true
           vuln-type: 'os,library'
-          severity: 'CRITICAL, HIGH'
+          severity: 'CRITICAL,HIGH'
 
       - name: Push images
         if: steps.changes.outputs.src == 'true'
@@ -338,12 +338,12 @@ jobs:
           ECR_REPOSITORY: 324062893129.dkr.ecr.us-east-1.amazonaws.com/ollama-repository
           IMAGE_TAG: prometheus_${{github.ref_name}}
         with:
-          image-ref: "${{ env.ECR_REPOSITORY }}:$IMAGE_TAG"
+          image-ref: "${{ env.ECR_REPOSITORY }}:${{ env.IMAGE_TAG }}"
           format: 'table'
-          exit_code: 0
+          exit-code: 0
           ignore-unfixed: true
           vuln-type: 'os,library'
-          severity: 'CRITICAL, HIGH'
+          severity: 'CRITICAL,HIGH'
 
       - name: Push images
         if: steps.changes.outputs.src == 'true'
