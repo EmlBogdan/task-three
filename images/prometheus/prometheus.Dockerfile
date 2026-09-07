@@ -4,3 +4,5 @@ COPY --chown=nobody:nobody images/prometheus/prometheus.yml /tmp/prometheus.yml
 
 CMD [ "--config.file=/tmp/prometheus.yml", "--storage.tsdb.path=/prometheus", "--web.enable-remote-write-receiver" ]
 
+
+
