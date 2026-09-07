@@ -157,6 +157,7 @@ jobs:
 
       - name: Pull dashboards
         id: pull-dashboards-for-prov
+        if: steps.changes.outputs.src == 'true'
         env: 
           GITHUB_REPO: https://github.com/EmlBogdan/dashboards
         run: |
@@ -164,6 +165,7 @@ jobs:
         
       - name: Pull alerts
         id: pull-alerts-for-prov
+        if: steps.changes.outputs.src == 'true'
         env: 
           GITHUB_REPO: https://github.com/EmlBogdan/alert_rules
         run: |
