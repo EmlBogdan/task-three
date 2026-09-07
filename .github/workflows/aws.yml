@@ -29,6 +29,8 @@ name: Deploy to Amazon ECS
 on:
   push:
     branches: [ "main" ]
+    tags:
+      - 'v*'
 
 jobs:
   build-ollama:
@@ -101,7 +103,7 @@ jobs:
         id: tag-ollama-image
         env:
           ECR_REPOSITORY: 324062893129.dkr.ecr.us-east-1.amazonaws.com/ollama-repository
-          IMAGE_TAG: ollama
+          IMAGE_TAG: ollama_${{github.ref_name}}
         run: |
           docker tag ollama:latest ollama:$IMAGE_TAG
           docker tag ollama:${IMAGE_TAG} $ECR_REPOSITORY:${IMAGE_TAG}
@@ -111,7 +113,7 @@ jobs:
           ECR_REPOSITORY: 324062893129.dkr.ecr.us-east-1.amazonaws.com/ollama-repository
         id: push-images
         run: |
-          docker push ${ECR_REPOSITORY}:ollama
+          docker push ${ECR_REPOSITORY}:ollama_${{github.ref_name}}
 
       - name: Download task definition
         run: |
@@ -125,7 +127,7 @@ jobs:
         with:
           task-definition: task-definition.json
           container-name: ollama-container
-          image: "${{env.ECR_REPOSITORY}}:ollama"
+          image: "${{env.ECR_REPOSITORY}}:ollama_${{github.ref_name}}"
       
 
       - name: Deploy Amazon ECS task definition
