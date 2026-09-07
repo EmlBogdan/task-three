@@ -365,8 +365,27 @@ jobs:
           cluster: ollama-cluster
           wait-for-service-stability: true
   
+  send-mail:
+    name: Send mail notification
+    needs: [deploy-ollama, deploy-grafana, deploy-prometheus]
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+      - name: Send mail
+        uses: dawidd6/action-send-mail@v18
+        with: 
+          server_address: smtp.gmail.com
+          server_port: 465
+          username: ${{secrets.MAIL_USERNAME}}
+          password: ${{secrets.MAIL_PASSWORD}}
+          subject: "Github actions pipeline status"
+          to: bieme@softserveinc.com
+          from: GitHub Actions
+          body: | 
+            Deploy pipeline finished with ${{ job.status }} status.
 
 
+        
 
 
 
