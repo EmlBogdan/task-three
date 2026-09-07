@@ -29,7 +29,9 @@ name: Deploy to Amazon ECS
 on:
   push:
     tags:
-      - 'v*'
+      - 'ollama_v*'
+      - 'grafana_v*'
+      - 'prometheus_v*'
 
 jobs:
   build-ollama:
@@ -102,17 +104,17 @@ jobs:
         id: tag-ollama-image
         env:
           ECR_REPOSITORY: 324062893129.dkr.ecr.us-east-1.amazonaws.com/ollama-repository
-          IMAGE_TAG: ollama_${{github.ref_name}}
+          IMAGE_TAG: ${{github.ref_name}}
         run: |
-          docker tag ollama:latest ollama:$IMAGE_TAG
-          docker tag ollama:${IMAGE_TAG} $ECR_REPOSITORY:${IMAGE_TAG}
+          docker tag ollama:latest $IMAGE_TAG
+          docker tag ${IMAGE_TAG} $ECR_REPOSITORY:${IMAGE_TAG}
 
       - name: Push images
         env:
           ECR_REPOSITORY: 324062893129.dkr.ecr.us-east-1.amazonaws.com/ollama-repository
         id: push-images
         run: |
-          docker push ${ECR_REPOSITORY}:ollama_${{github.ref_name}}
+          docker push ${ECR_REPOSITORY}:${{github.ref_name}}
 
       - name: Download task definition
         run: |
@@ -126,7 +128,7 @@ jobs:
         with:
           task-definition: task-definition.json
           container-name: ollama-container
-          image: "${{env.ECR_REPOSITORY}}:ollama_${{github.ref_name}}"
+          image: "${{env.ECR_REPOSITORY}}:${{github.ref_name}}"
       
 
       - name: Deploy Amazon ECS task definition
@@ -221,17 +223,17 @@ jobs:
         id: tag-grafana-image
         env:
           ECR_REPOSITORY: 324062893129.dkr.ecr.us-east-1.amazonaws.com/ollama-repository
-          IMAGE_TAG: grafana_${{github.ref_name}}
+          IMAGE_TAG: ${{github.ref_name}}
         run: |
-          docker tag grafana:latest grafana:$IMAGE_TAG
-          docker tag grafana:${IMAGE_TAG} $ECR_REPOSITORY:${IMAGE_TAG}
+          docker tag grafana:latest $IMAGE_TAG
+          docker tag ${IMAGE_TAG} $ECR_REPOSITORY:${IMAGE_TAG}
 
       - name: Push images
         env:
           ECR_REPOSITORY: 324062893129.dkr.ecr.us-east-1.amazonaws.com/ollama-repository
         id: push-images
         run: |
-          docker push ${ECR_REPOSITORY}:grafana_${{github.ref_name}}
+          docker push ${ECR_REPOSITORY}:${{github.ref_name}}
 
       - name: Download task definition
         run: |
@@ -245,7 +247,7 @@ jobs:
         with:
           task-definition: task-definition.json
           container-name: grafana-container
-          image: "${{env.ECR_REPOSITORY}}:grafana_${{github.ref_name}}"
+          image: "${{env.ECR_REPOSITORY}}:${{github.ref_name}}"
       
 
       - name: Deploy Amazon ECS task definition
@@ -328,15 +330,15 @@ jobs:
           ECR_REPOSITORY: 324062893129.dkr.ecr.us-east-1.amazonaws.com/ollama-repository
           IMAGE_TAG: prometheus_${{github.ref_name}}
         run: |
-          docker tag prometheus:latest prometheus:$IMAGE_TAG
-          docker tag prometheus:${IMAGE_TAG} $ECR_REPOSITORY:${IMAGE_TAG}
+          docker tag prometheus:latest $IMAGE_TAG
+          docker tag ${IMAGE_TAG} $ECR_REPOSITORY:${IMAGE_TAG}
 
       - name: Push images
         env:
           ECR_REPOSITORY: 324062893129.dkr.ecr.us-east-1.amazonaws.com/ollama-repository
         id: push-images
         run: |
-          docker push ${ECR_REPOSITORY}:prometheus_${{github.ref_name}}
+          docker push ${ECR_REPOSITORY}:${{github.ref_name}}
 
       - name: Download task definition
         run: |
@@ -350,7 +352,7 @@ jobs:
         with:
           task-definition: task-definition.json
           container-name: prometheus-container
-          image: "${{env.ECR_REPOSITORY}}:prometheus_${{github.ref_name}}"
+          image: "${{env.ECR_REPOSITORY}}:${{github.ref_name}}"
       
 
       - name: Deploy Amazon ECS task definition
