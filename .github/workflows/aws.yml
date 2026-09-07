@@ -351,7 +351,7 @@ jobs:
           ECR_REPOSITORY: 324062893129.dkr.ecr.us-east-1.amazonaws.com/ollama-repository
         id: push-images
         run: |
-          docker push ${ECR_REPOSITORY}:${{github.ref_name}}
+          docker push ${ECR_REPOSITORY}:prometheus_${{github.ref_name}}
 
   deploy-prometheus:
     name: Deploy prometheus
