@@ -77,17 +77,6 @@ resource "aws_lb_target_group" "llm_tg" {
   }
 }
 
-resource "aws_lb_listener" "ollama_listener" {
-  load_balancer_arn = aws_lb.ollama_alb.arn
-  port              = 11434
-  protocol          = "HTTP"
-
-  default_action {
-    type             = "forward"
-    target_group_arn = aws_lb_target_group.llm_tg.arn
-  }
-}
-
 
 resource "aws_lb_target_group" "webui_tg" {
   name        = "webui-tg-t-one"

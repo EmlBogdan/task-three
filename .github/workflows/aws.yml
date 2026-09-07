@@ -99,7 +99,7 @@ jobs:
       env:
         ECR_REPOSITORY: 324062893129.dkr.ecr.us-east-1.amazonaws.com/ollama-repository
       run: |
-        docker build -t webui-base-image:latest -f images/webui.Dockerfile .
+        docker pull ghcr.io/open-webui/open-webui:main
     
     - name: Tag grafana image 
       id: tag-grafana-image
@@ -107,8 +107,8 @@ jobs:
         ECR_REPOSITORY: 324062893129.dkr.ecr.us-east-1.amazonaws.com/ollama-repository
         IMAGE_TAG: webui-base-image
       run: |
-        docker tag webui-base-image:latest webui-base-image:$IMAGE_TAG
-        docker tag webui-base-image:${IMAGE_TAG} $ECR_REPOSITORY:${IMAGE_TAG}
+        docker tag ghcr.io/open-webui/open-webui:main ghcr.io/open-webui/open-webui:$IMAGE_TAG
+        docker tag ghcr.io/open-webui/open-webui:${IMAGE_TAG} $ECR_REPOSITORY:${IMAGE_TAG}
 
 
     - name: Push images

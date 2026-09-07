@@ -1,24 +1,3 @@
-terraform {
-  required_providers {
-    aws = {
-      source  = "hashicorp/aws"
-      version = "~> 5.92"
-    }
-  }
-  backend "s3" {
-    bucket       = "task-one-backend"
-    key          = "terraform.tfstate"
-    region       = "us-east-1"
-    encrypt      = true
-    use_lockfile = true
-  }
-}
-
-provider "aws" {
-  profile = "my_account"
-}
-
-
 resource "aws_iam_role" "monitoring_host_role" {
   name = "Monitoring-host-role"
 
@@ -32,7 +11,7 @@ resource "aws_iam_role" "monitoring_host_role" {
         Principal = {
           Service = "ecs-tasks.amazonaws.com"
         }
-      },
+      }
     ]
   })
 }
