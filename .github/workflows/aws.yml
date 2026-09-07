@@ -84,6 +84,20 @@ jobs:
           docker tag ollama:latest $IMAGE_TAG
           docker tag ${IMAGE_TAG} $ECR_REPOSITORY:${IMAGE_TAG}
 
+      - name: Scan image
+        if: steps.changes.outputs.src == 'true'
+        uses: aquasecurity/trivy-action@master
+        env:
+          ECR_REPOSITORY: 324062893129.dkr.ecr.us-east-1.amazonaws.com/ollama-repository
+          IMAGE_TAG: ollama_${{github.ref_name}}
+        with:
+          image-ref: "${{ env.ECR_REPOSITORY }}:${{ github.ref_name }}"
+          format: 'table'
+          exit_code: 0
+          ignore-unfixed: true
+          vuln-type: 'os,library'
+          severity: 'CRITICAL, HIGH'
+
       - name: Push images
         if: steps.changes.outputs.src == 'true'
         env:
@@ -174,8 +188,7 @@ jobs:
         id: build-grafana-image
         run: |
           docker build -t grafana:latest -f images/grafana/grafana.Dockerfile .  
-          docker save -o grafana-image.tar grafana:latest
-      
+
       - name: Configure AWS credentials
         if: steps.changes.outputs.src == 'true'
         uses: aws-actions/configure-aws-credentials@v6.2.3
@@ -201,6 +214,20 @@ jobs:
         run: |
           docker tag grafana:latest $IMAGE_TAG
           docker tag ${IMAGE_TAG} $ECR_REPOSITORY:${IMAGE_TAG}
+
+      - name: Scan image
+        if: steps.changes.outputs.src == 'true'
+        uses: aquasecurity/trivy-action@master
+        env:
+          ECR_REPOSITORY: 324062893129.dkr.ecr.us-east-1.amazonaws.com/ollama-repository
+          IMAGE_TAG: grafana_${{github.ref_name}}
+        with:
+          image-ref: "${{ env.ECR_REPOSITORY }}:${{ github.ref_name }}"
+          format: 'table'
+          exit_code: 0
+          ignore-unfixed: true
+          vuln-type: 'os,library'
+          severity: 'CRITICAL, HIGH'
 
       - name: Push images
         if: steps.changes.outputs.src == 'true'
@@ -304,6 +331,20 @@ jobs:
           docker tag prometheus:latest $IMAGE_TAG
           docker tag ${IMAGE_TAG} $ECR_REPOSITORY:${IMAGE_TAG}
 
+      - name: Scan image
+        if: steps.changes.outputs.src == 'true'
+        uses: aquasecurity/trivy-action@master
+        env:
+          ECR_REPOSITORY: 324062893129.dkr.ecr.us-east-1.amazonaws.com/ollama-repository
+          IMAGE_TAG: prometheus_${{github.ref_name}}
+        with:
+          image-ref: "${{ env.ECR_REPOSITORY }}:${{ github.ref_name }}"
+          format: 'table'
+          exit_code: 0
+          ignore-unfixed: true
+          vuln-type: 'os,library'
+          severity: 'CRITICAL, HIGH'
+
       - name: Push images
         if: steps.changes.outputs.src == 'true'
         env:
@@ -369,7 +410,7 @@ jobs:
           password: ${{secrets.MAIL_PASSWORD}}
           subject: "Github actions pipeline status"
           to: bieme@softserveinc.com
-          from: GitHub Actions
+          from: GitHub Actions <${{ secrets.MAIL_USERNAME }}
           body: | 
             Deploy pipeline finished with ${{ job.status }} status.
 
