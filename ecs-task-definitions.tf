@@ -9,14 +9,10 @@ resource "aws_ecs_task_definition" "webui_task_definition" {
     {
       name  = "webui-container"
       image = "${data.aws_ecr_repository.ollama-repository.repository_url}:webui-base-image"
-      environment = [
+      secrets = [
         {
-          name  = "DATABASE_URL"
-          value = "postgresql://${aws_db_instance.postgres.username}:${urlencode(aws_db_instance.postgres.password)}@${aws_db_instance.postgres.endpoint}/openwebui"
-        },
-        {
-          name  = "OLLAMA_BASE_URL"
-          value = "https://ollama.universal-domain.online"
+          name      = "DATABASE_URL"
+          valueFrom = aws_secretsmanager_secret.db_url.arn
         }
       ]
       cpu       = 1024
