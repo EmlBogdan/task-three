@@ -254,7 +254,7 @@ jobs:
       id-token: write
       contents: read
     runs-on: ubuntu-latest
-    if: needs.build-ollama.outputs.is_changed == 'true'
+    if: needs.build-grafana.outputs.is_changed == 'true'
     needs: build-grafana
     steps:
       - name: Checkout code
