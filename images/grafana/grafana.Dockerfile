@@ -8,3 +8,5 @@ COPY --chown=grafana:grafana rules /etc/grafana/provisioning/alerting
 CMD [./run.sh]
 
 
+
+
