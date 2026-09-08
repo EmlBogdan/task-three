@@ -6,3 +6,4 @@ COPY --chown=grafana:grafana dashboards /var/lib/grafana/dashboards
 COPY --chown=grafana:grafana rules /etc/grafana/provisioning/alerting
 
 CMD [./run.sh]
+
