@@ -145,17 +145,16 @@ jobs:
           task-definition: ${{ steps.task-def.outputs.task-definition }}
           service: ollama
           cluster: ollama-cluster
-          wait-for-service-stability: true
       
       - name: Health check
-        run: curl -f https://universal-domain.online/ || exit 1
+        run: aws ecs wait services-stable --cluster ollama-cluster --services ollama --region us-east-1
 
       - name: Rollback
         if: failure ()
         uses: aws-actions/amazon-ecs-deploy-task-definition@v2
-        with: 
+        with:
           task-definition: task-definition.json
-          service: ollama 
+          service: grafana
           cluster: ollama-cluster
           wait-for-service-stability: true
 
@@ -290,7 +289,7 @@ jobs:
           cluster: ollama-cluster
 
       - name: Health check
-        run: aws ecs wait service-stable --cluster ollama-cluster --services grafana --region us-east-1
+        run: aws ecs wait services-stable --cluster ollama-cluster --services grafana --region us-east-1
 
       - name: Rollback
         if: failure ()
@@ -414,17 +413,16 @@ jobs:
           task-definition: ${{ steps.task-def.outputs.task-definition }}
           service: prometheus
           cluster: ollama-cluster
-          wait-for-service-stability: true
 
       - name: Health check
-        run: curl -f https://prometheus.universal-domain.online/-/healthy || exit 1
+        run: aws ecs wait services-stable --cluster ollama-cluster --services prometheus --region us-east-1
 
       - name: Rollback
         if: failure ()
         uses: aws-actions/amazon-ecs-deploy-task-definition@v2
-        with: 
+        with:
           task-definition: task-definition.json
-          service: prometheus 
+          service: prometheus
           cluster: ollama-cluster
           wait-for-service-stability: true
   
