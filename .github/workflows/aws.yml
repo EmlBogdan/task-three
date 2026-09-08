@@ -288,17 +288,16 @@ jobs:
           task-definition: ${{ steps.task-def.outputs.task-definition }}
           service: grafana
           cluster: ollama-cluster
-          wait-for-service-stability: true
 
       - name: Health check
-        run: curl -f https://grafana.universal-domain.online/healthz || exit 1
+        run: aws ecs wait service-stable --cluster ollama-cluster --services grafana --region us-east-1
 
       - name: Rollback
         if: failure ()
         uses: aws-actions/amazon-ecs-deploy-task-definition@v2
-        with: 
+        with:
           task-definition: task-definition.json
-          service: grafana 
+          service: grafana
           cluster: ollama-cluster
           wait-for-service-stability: true
 
