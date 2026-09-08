@@ -139,12 +139,23 @@ jobs:
           container-name: ollama-container
           image: "${{env.ECR_REPOSITORY}}:ollama_${{github.ref_name}}"
       
-
       - name: Deploy Amazon ECS task definition
         uses: aws-actions/amazon-ecs-deploy-task-definition@v2
         with:
           task-definition: ${{ steps.task-def.outputs.task-definition }}
           service: ollama
+          cluster: ollama-cluster
+          wait-for-service-stability: true
+      
+      - name: Health check
+        run: curl -f https://universal-domain.online/ || exit 1
+
+      - name: Rollback
+        if: failure ()
+        uses: aws-actions/amazon-ecs-deploy-task-definition@v2
+        with: 
+          task-definition: task-definition.json
+          service: ollama 
           cluster: ollama-cluster
           wait-for-service-stability: true
 
@@ -279,6 +290,18 @@ jobs:
           cluster: ollama-cluster
           wait-for-service-stability: true
 
+      - name: Health check
+        run: curl -f https://grafana.universal-domain.online/healthz || exit 1
+
+      - name: Rollback
+        if: failure ()
+        uses: aws-actions/amazon-ecs-deploy-task-definition@v2
+        with: 
+          task-definition: task-definition.json
+          service: grafana 
+          cluster: ollama-cluster
+          wait-for-service-stability: true
+
   build-prometheus:
     name: Build prometheus
     runs-on: ubuntu-latest
@@ -385,13 +408,24 @@ jobs:
           task-definition: task-definition.json
           container-name: prometheus-container
           image: "${{env.ECR_REPOSITORY}}:prometheus_${{github.ref_name}}"
-      
 
       - name: Deploy Amazon ECS task definition
         uses: aws-actions/amazon-ecs-deploy-task-definition@v2
         with:
           task-definition: ${{ steps.task-def.outputs.task-definition }}
           service: prometheus
+          cluster: ollama-cluster
+          wait-for-service-stability: true
+
+      - name: Health check
+        run: curl -f https://prometheus.universal-domain.online/-/healthy || exit 1
+
+      - name: Rollback
+        if: failure ()
+        uses: aws-actions/amazon-ecs-deploy-task-definition@v2
+        with: 
+          task-definition: task-definition.json
+          service: prometheus 
           cluster: ollama-cluster
           wait-for-service-stability: true
   
